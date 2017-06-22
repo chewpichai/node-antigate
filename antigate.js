@@ -1,5 +1,6 @@
 var fs = require('fs'),
-    request = require('request');
+    request = require('request'),
+    parseString = require('xml2js').parseString;
 
 
 var Antigate = function (key) {
@@ -166,6 +167,23 @@ Antigate.prototype.getBalance = function (callback) {
             callback(error, null);
         } else {
             callback(null, parseFloat(body));
+        }
+    });
+};
+
+Antigate.prototype.getServerLoad = function (callback) {
+    var url = 'http://antigate.com/load.php'
+    request.get(url, function(error, response, body) {
+        if (error) {
+            callback(error, null);
+        } else {
+            parseString(body, function (error, result) {
+                if (error) {
+                    callback(error, null);
+                } else {
+                    callback(null, parseFloat(result['RESPONSE']['load'][0]));
+                }
+            });
         }
     });
 };
